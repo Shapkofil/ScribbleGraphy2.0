@@ -1,0 +1,8 @@
+<resources>
+  <string name="app_name" translatable="false">ScribbleGraphy2.0</string>
+  <string name="clear_button_text" translatable="false">Clear canvas</string>
+  <string name="nt_button_text" translatable="false">Reset symbol</string>
+  <string name="prediction_text_placeholder" translatable="false">Please draw this: </string>
+  <string name="classification_error_message" translatable="false">Error classifying drawing: %s</string>
+  <string name="datadir" translatable="false">images_background</string>
+</resources>
