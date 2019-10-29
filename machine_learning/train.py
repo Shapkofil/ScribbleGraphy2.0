@@ -6,6 +6,7 @@ import os
 
 import cv2
 import time
+import gc
 
 import tensorflow as tf
 from tensorflow.keras import backend as K
@@ -30,20 +31,21 @@ def get_siamese_model(input_shape):
     # Convolutional Neural Network
     model = tf.keras.models.Sequential()
     model.add(layers.Conv2D(64, (10,10), activation='relu', input_shape=input_shape,
-                   kernel_initializer=initialize_weights))
+                   kernel_initializer=initialize_weights, kernel_regularizer=tf.keras.regularizers.l2(2e-4)))
     model.add(layers.MaxPooling2D())
     model.add(layers.Conv2D(128, (7,7), activation='relu',
                      kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias))
+                     bias_initializer=initialize_bias, kernel_regularizer=tf.keras.regularizers.l2(2e-4)))
     model.add(layers.MaxPooling2D())
     model.add(layers.Conv2D(128, (4,4), activation='relu', kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias))
+                     bias_initializer=initialize_bias, kernel_regularizer=tf.keras.regularizers.l2(2e-4)))
     model.add(layers.MaxPooling2D())
     model.add(layers.Conv2D(256, (4,4), activation='relu', kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias))
+                     bias_initializer=initialize_bias, kernel_regularizer=tf.keras.regularizers.l2(2e-4)))
     model.add(layers.Flatten())
     model.add(layers.Dense(4096, activation='sigmoid',
-                   kernel_initializer=initialize_weights,bias_initializer=initialize_bias))
+                   kernel_initializer=initialize_weights,bias_initializer=initialize_bias,
+                          kernel_regularizer=tf.keras.regularizers.l2(1e-3)))
     
     # Generate the encodings (feature vectors) for the two images
     encoded_l = model(left_input)
@@ -161,7 +163,7 @@ if __name__ == '__main__':
 	save_path = '/media/shapkofil/HDD/Machine_Learning/SNN'
 
 	# Hyper parameters
-	evaluate_every = 200 # interval for evaluating on one-shot tasks
+	evaluate_every = 2000 # interval for evaluating on one-shot tasks
 	batch_size = 32
 	n_iter = 20000 # No. of training iterations
 	N_way = 20 # how many classes for testing one-shot tasks
@@ -200,6 +202,10 @@ if __name__ == '__main__':
 	        if val_acc >= best:
 	            print("Current best: {0}, previous best: {1}".format(val_acc, best))
 	            best = val_acc
+	    #Colect the garbage
+	    gc.collect()
+
+
 	
 	#Saving architecture         
 	with open('./finalModel/oneshot_architecture.json', 'w') as f:
